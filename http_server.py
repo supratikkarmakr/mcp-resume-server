@@ -78,7 +78,31 @@ async def handle_mcp_request(request: web_request.Request):
     method = data.get('method', '')
     request_id = data.get('id', 1)
     
-    if method == 'tools/list':
+    if method == 'initialize':
+        # Initialize MCP connection
+        params = data.get('params', {})
+        client_info = params.get('clientInfo', {})
+        protocol_version = params.get('protocolVersion', '2024-11-05')
+        
+        response = {
+            "jsonrpc": "2.0",
+            "id": request_id,
+            "result": {
+                "protocolVersion": "2024-11-05",
+                "capabilities": {
+                    "tools": {},
+                    "logging": {}
+                },
+                "serverInfo": {
+                    "name": "mcp-resume-server",
+                    "version": "1.0.0"
+                }
+            }
+        }
+        logger.info(f"MCP initialized with client: {client_info.get('name', 'unknown')}")
+        return web.json_response(response)
+    
+    elif method == 'tools/list':
         # List available tools
         response = {
             "jsonrpc": "2.0",
